@@ -60,22 +60,31 @@ jobs:
           sdkmanager "platforms;android-35"
           sdkmanager "build-tools;35.0.0"
 
-      - name: Build GlassLedger APK
-        shell: bash
-        run: |
-         cd project
-         gradle --no-daemon :app:assembleDebug
+      - name: Extract Android project
+  shell: bash
+  run: |
+    rm -rf build_source
+    mkdir -p build_source
+    unzip -o GlassLedger_v7_FIXED.zip -d build_source
+    echo "Project files:"
+    find build_source -maxdepth 3 -type f | head -100
+
+       - name: Build GlassLedger APK
+    shell: bash
+    run: |
+    cd build_source/project
+    gradle --no-daemon :app:assembleDebug
 
       - name: Verify APK
-        shell: bash
-        run: |
-         echo "Checking APK..."
-         ls -lh project/app/build/outputs/apk/debug/
-         test -f project/app/build/outputs/apk/debug/app-debug.apk
-
-      - name: Upload GlassLedger APK
-        uses: actions/upload-artifact@v4
-        with:
-         name: GlassLedger-APK
-         path: project/app/build/outputs/apk/debug/app-debug.apk
-         if-no-files-found: error
+  shell: bash
+  run: |
+    echo "Checking APK..."
+    ls -lh build_source/project/app/build/outputs/apk/debug/
+    test -f build_source/project/app/build/outputs/apk/debug/app-debug.apk                    
+    
+        - name: Upload GlassLedger APK
+  uses: actions/upload-artifact@v4
+    with:
+     name: GlassLedger-APK
+     path: build_source/project/app/build/outputs/apk/debug/app-debug.apk
+     if-no-files-found: error
